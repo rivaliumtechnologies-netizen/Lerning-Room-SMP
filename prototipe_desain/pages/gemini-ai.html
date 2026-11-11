@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Gemini - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
+    <div>
+      <div class="p-3 mb-4 flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div><h2 class="font-extrabold text-xs text-slate-800 leading-none">Room Learning</h2><span class="text-[9px] font-bold text-blue-600">SMP</span></div>
+      </div>
+      <nav class="space-y-1">
+        <a href="../siswa/dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-house w-4"></i><span>Beranda</span></a>
+        <a href="../siswa/materi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-book-open w-4"></i><span>Materi</span></a>
+        <a href="../siswa/tugas.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-clipboard w-4"></i><span>Tugas</span></a>
+        <a href="./gemini-ai.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs"><i class="fa-solid fa-sparkles text-blue-600 w-4"></i><span>AI Gemini</span></a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Area Chat AI -->
+  <main class="flex-1 bg-white flex flex-col justify-between h-full relative">
+    <div id="chat-container" class="flex-1 overflow-y-auto p-8 flex flex-col items-center">
+      <div id="welcome-card" class="max-w-xl w-full text-center my-auto">
+        <div class="flex justify-center gap-2 mb-4">
+          <button type="button" onclick="setRole('siswa')" id="role-siswa" class="rounded-full border px-3 py-1.5 text-xs font-semibold transition">Siswa</button>
+          <button type="button" onclick="setRole('guru')" id="role-guru" class="rounded-full border px-3 py-1.5 text-xs font-semibold transition">Guru (Referensi)</button>
+        </div>
+
+        <h1 class="text-2xl font-extrabold text-blue-700 mb-1 flex items-center justify-center gap-2">AI Gemini <span class="text-amber-400 text-lg">✨</span></h1>
+        <p id="role-subtitle" class="text-xs text-slate-500 mb-6">Asisten pintar untuk belajar dan mengerjakan tugasmu</p>
+
+        <div id="role-card" class="bg-slate-50/70 border border-slate-100 rounded-3xl p-6 text-left flex items-center justify-between"></div>
+      </div>
+
+      <div id="messages-list" class="max-w-xl w-full space-y-4 hidden flex-col"></div>
+    </div>
+
+    <!-- Input Form -->
+    <div class="p-6 bg-white border-t border-slate-100 flex flex-col items-center">
+      <form onsubmit="sendMessage(event)" class="max-w-xl w-full relative flex items-center">
+        <input type="text" id="user-input" placeholder="Ketik pertanyaanmu di sini..." class="w-full pl-5 pr-14 py-3.5 text-xs rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20" required autocomplete="off" />
+        <button type="submit" class="absolute right-2 w-9 h-9 bg-blue-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-blue-200"><i class="fa-solid fa-paper-plane text-xs"></i></button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    let currentRole = 'siswa';
+
+    function setRole(role) {
+      currentRole = role;
+      const siswaBtn = document.getElementById('role-siswa');
+      const guruBtn = document.getElementById('role-guru');
+      const subtitle = document.getElementById('role-subtitle');
+      const roleCard = document.getElementById('role-card');
+      const input = document.getElementById('user-input');
+
+      siswaBtn.className = role === 'siswa'
+        ? 'rounded-full border border-blue-200 bg-blue-600 text-white px-3 py-1.5 text-xs font-semibold transition'
+        : 'rounded-full border px-3 py-1.5 text-xs font-semibold transition';
+
+      guruBtn.className = role === 'guru'
+        ? 'rounded-full border border-amber-200 bg-amber-500 text-white px-3 py-1.5 text-xs font-semibold transition'
+        : 'rounded-full border px-3 py-1.5 text-xs font-semibold transition';
+
+      if (role === 'guru') {
+        subtitle.textContent = 'Referensi pendukung untuk guru dalam menyusun materi dan evaluasi';
+        roleCard.innerHTML = `
+          <div class="space-y-3">
+            <p class="text-xs font-semibold">Mode guru aktif.</p>
+            <p class="text-xs font-bold text-amber-600">Aku bisa membantu untuk:</p>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+              <li>Menyusun ringkasan materi pembelajaran</li>
+              <li>Membuat contoh soal dan kuis</li>
+              <li>Memberi referensi jawaban dan ide kegiatan belajar</li>
+            </ul>
+          </div>
+          <div class="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center text-4xl text-amber-600 shrink-0">📘</div>
+        `;
+        input.placeholder = 'Tanyakan referensi untuk mengajar...';
+      } else {
+        subtitle.textContent = 'Asisten pintar untuk belajar dan mengerjakan tugasmu';
+        roleCard.innerHTML = `
+          <div class="space-y-3">
+            <p class="text-xs font-semibold">Halo! Aku Gemini, asisten belajarmu.</p>
+            <p class="text-xs font-bold text-blue-600">Aku bisa membantu kamu:</p>
+            <ul class="text-xs text-slate-600 space-y-1 list-disc list-inside">
+              <li>Menjelaskan materi pelajaran</li>
+              <li>Mengerjakan soal latihan</li>
+              <li>Membantu memahami tugas</li>
+            </ul>
+          </div>
+          <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center text-4xl text-blue-600 shrink-0">🤖</div>
+        `;
+        input.placeholder = 'Ketik pertanyaanmu di sini...';
+      }
+    }
+
+    function sendMessage(e) {
+      e.preventDefault();
+      const input = document.getElementById('user-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const list = document.getElementById('messages-list');
+      document.getElementById('welcome-card').classList.add('hidden');
+      list.classList.remove('hidden');
+      list.classList.add('flex');
+
+      appendUserMessage(text);
+      input.value = '';
+      scrollToBottom();
+
+      appendTypingIndicator();
+      setTimeout(() => {
+        removeTypingIndicator();
+        const response = getGeminiResponse(text, currentRole);
+        appendGeminiReply(response);
+        scrollToBottom();
+      }, 800);
+    }
+
+    function appendUserMessage(text) {
+      const list = document.getElementById('messages-list');
+      list.innerHTML += `
+        <div class="flex justify-end">
+          <div class="bg-blue-600 text-white rounded-2xl p-3 text-xs max-w-[80%] break-words">${escapeHtml(text)}</div>
+        </div>
+      `;
+    }
+
+    function appendGeminiReply(message) {
+      const list = document.getElementById('messages-list');
+      list.innerHTML += `
+        <div class="flex justify-start items-start gap-2">
+          <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">✨</div>
+          <div class="bg-slate-100 rounded-2xl p-3 text-xs text-slate-800 max-w-[80%] break-words">${escapeHtml(message)}</div>
+        </div>
+      `;
+    }
+
+    function appendTypingIndicator() {
+      const list = document.getElementById('messages-list');
+      list.innerHTML += `
+        <div class="flex justify-start items-center gap-2" id="typing-indicator">
+          <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">✨</div>
+          <div class="bg-slate-100 rounded-2xl p-3 text-xs text-slate-500 max-w-[80%]">Gemini sedang mengetik...</div>
+        </div>
+      `;
+    }
+
+    function removeTypingIndicator() {
+      const indicator = document.getElementById('typing-indicator');
+      if (indicator) indicator.remove();
+    }
+
+    function scrollToBottom() {
+      const container = document.getElementById('chat-container');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function getGeminiResponse(text, role) {
+      const normalized = text.toLowerCase();
+      const replies = role === 'guru'
+        ? [
+            {
+              keywords: ['materi', 'pelajaran', 'ringkasan', 'penjelasan', 'bab'],
+              answer: 'Untuk referensi mengajar, saya bisa membantu menyusun ringkasan materi yang singkat, jelas, dan sesuai tingkat siswa.'
+            },
+            {
+              keywords: ['soal', 'kuis', 'latihan', 'evaluasi', 'ujian'],
+              answer: 'Saya bisa menyarankan contoh soal, kuis singkat, atau pertanyaan evaluasi yang cocok untuk kelas tersebut.'
+            },
+            {
+              keywords: ['aktivitas', 'kegiatan', 'diskusi', 'praktik'],
+              answer: 'Saya bisa memberi ide aktivitas belajar, diskusi, atau tugas praktik yang relevan untuk pembelajaran.'
+            },
+            {
+              keywords: ['halo', 'hai', 'hey', 'selamat'],
+              answer: 'Halo, Bapak/Ibu guru. Saya siap membantu sebagai referensi pembelajaran, soal, atau ide kegiatan mengajar.'
+            }
+          ]
+        : [
+            {
+              keywords: ['apa itu', 'apa', 'jelas', 'mengapa', 'kenapa', 'bagaimana', 'definisi'],
+              answer: 'Ini penjelasan singkat: coba jelaskan lagi topiknya secara spesifik supaya aku bisa membantu dengan ringkasan dan contoh.'
+            },
+            {
+              keywords: ['soal', 'latihan', 'kerjakan', 'jawab', 'contoh soal'],
+              answer: 'Mari kita kerjakan bersama. Kirimkan soal lengkapnya, lalu aku akan bantu menjelaskan langkah demi langkah.'
+            },
+            {
+              keywords: ['tugas', 'deadline', 'kumpul', 'tenggat'],
+              answer: 'Untuk tugas, sebaiknya mulai dengan memahami materi utama. Aku bisa bantu membuat rangkuman atau saran struktur jawaban.'
+            },
+            {
+              keywords: ['nilai', 'rapor', 'ujian', 'semester'],
+              answer: 'Nilai bisa meningkat dengan latihan teratur. Mau aku bantu buatkan jadwal belajar atau soal latihan terkait mata pelajaranmu?'
+            },
+            {
+              keywords: ['belajar', 'materi', 'pelajaran', 'mapel'],
+              answer: 'Aku bisa membantu menjelaskan materi secara ringkas atau memberi contoh untuk memperdalam pemahamanmu.'
+            },
+            {
+              keywords: ['halo', 'hai', 'hey', 'selamat'],
+              answer: 'Halo! Ada yang bisa aku bantu hari ini? Kamu bisa tanya tentang pelajaran, tugas, atau soal latihan.'
+            }
+          ];
+
+      for (const reply of replies) {
+        if (reply.keywords.some((keyword) => normalized.includes(keyword))) {
+          return reply.answer;
+        }
+      }
+
+      return role === 'guru'
+        ? 'Saya siap menjadi referensi untuk materi, soal, dan ide pembelajaran. Coba jelaskan kebutuhan mengajar Anda.'
+        : 'Menarik! Aku siap membantu. Coba tanyakan apa yang ingin kamu pelajari atau minta contoh soal.';
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    setRole(currentRole);
+  </script>
+</body>
+</html>

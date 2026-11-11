@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Materi Siswa - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
+    <div>
+      <div class="p-3 mb-4 flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div><h2 class="font-extrabold text-xs text-slate-800 leading-none">Room Learning</h2><span class="text-[9px] font-bold text-blue-600">SMP</span></div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-house w-4"></i><span>Beranda</span></a>
+        <a href="materi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs"><i class="fa-regular fa-book-open w-4"></i><span>Materi</span></a>
+        <a href="tugas.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-clipboard w-4"></i><span>Tugas</span></a>
+        <a href="../pages/gemini-ai.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-sparkles text-blue-600 w-4"></i><span>AI Gemini</span></a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content -->
+  <main class="flex-1 overflow-y-auto p-8 flex gap-8">
+    <div class="flex-1">
+      <div id="subjectListSection" class="space-y-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h1 class="text-2xl font-extrabold text-slate-800 mb-1">Mata Pelajaran</h1>
+            <p class="text-xs text-slate-500">Pilih mata pelajaran untuk melihat permateri dan materi pembelajaran.</p>
+          </div>
+        </div>
+        <div id="subjectCards" class="grid grid-cols-4 gap-4"></div>
+      </div>
+
+      <div id="subjectDetailSection" class="hidden space-y-6">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div id="breadCrumb" class="text-xs text-slate-400 mb-2">Materi > IPA > Sistem Pernapasan Manusia</div>
+            <h1 id="pageTitle" class="text-2xl font-extrabold text-slate-800 mb-1">Sistem Pernapasan Manusia</h1>
+            <p id="pageMeta" class="text-xs text-slate-500 mb-6">IPA • Kelas VIII</p>
+          </div>
+          <a href="materi.html" class="text-xs font-bold text-blue-600 hover:underline">Kembali ke Mata Pelajaran</a>
+        </div>
+
+        <div class="flex gap-4 border-b border-slate-200 mb-6 text-xs font-bold">
+          <button class="pb-2 border-b-2 border-blue-600 text-blue-600">Ringkasan</button>
+          <button class="pb-2 text-slate-400 hover:text-slate-600">Video</button>
+          <button class="pb-2 text-slate-400 hover:text-slate-600">File</button>
+          <button class="pb-2 text-slate-400 hover:text-slate-600">Latihan</button>
+        </div>
+
+        <div class="bg-white p-6 rounded-3xl border border-slate-100 mb-6 space-y-4">
+          <p id="summaryText" class="text-xs text-slate-600 leading-relaxed">Materi ini membahas tentang organ-organ pernapasan manusia serta proses pernapasan yang terjadi di dalam tubuh.</p>
+          <div>
+            <h4 class="text-xs font-bold text-blue-600 mb-2">Tujuan Pembelajaran</h4>
+            <ul id="objectiveList" class="text-xs text-slate-600 space-y-1.5 list-disc list-inside"></ul>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-slate-50 p-5 rounded-3xl">
+            <h3 class="font-bold text-sm text-slate-800 mb-3">Daftar Permateri</h3>
+            <div id="materialList" class="space-y-3"></div>
+          </div>
+          <div class="bg-slate-50 p-5 rounded-3xl">
+            <h3 class="font-bold text-sm text-slate-800 mb-3">Ringkasan Mata Pelajaran</h3>
+            <div class="space-y-3">
+              <div><span class="text-slate-400 block text-[10px]">Kelas</span><span id="detailClass" class="font-semibold">VIII</span></div>
+              <div><span class="text-slate-400 block text-[10px]">Mata Pelajaran</span><span id="detailSubject" class="font-semibold">IPA</span></div>
+              <div><span class="text-slate-400 block text-[10px]">Guru</span><span id="detailTeacher" class="font-semibold">Bu Sari</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sidebarSection" class="w-72 space-y-6 hidden">
+      <div class="bg-blue-50 border border-blue-100 p-5 rounded-3xl text-center">
+        <h4 class="font-bold text-xs text-blue-900 mb-1">Punya pertanyaan?</h4>
+        <p class="text-[11px] text-blue-700 mb-4">Tanya AI Gemini tentang materi ini.</p>
+        <a href="../pages/gemini-ai.html" class="block w-full bg-blue-600 text-white font-bold py-2.5 rounded-xl text-xs shadow-md shadow-blue-200">Tanya Sekarang</a>
+      </div>
+    </div>
+  </main>
+  <script>
+    const subjectData = {
+      Matematika: {
+        title: 'Persamaan Garis Lurus',
+        meta: 'Matematika • Kelas VIII',
+        breadcrumb: 'Materi > Matematika > Persamaan Garis Lurus',
+        summary: 'Pelajari konsep dan langkah menyelesaikan persamaan garis lurus serta penerapannya pada koordinat Cartesian.',
+        objectives: [
+          'Siswa dapat memahami bentuk persamaan garis lurus.',
+          'Siswa dapat menentukan gradien dan titik potong pada sumbu.',
+          'Siswa dapat menerapkan persamaan garis lurus dalam soal cerita.',
+        ],
+        materials: [
+          { title: '1. Persamaan Garis Lurus Dasar', info: 'PDF • 1.8 MB' },
+          { title: '2. Contoh Soal Garis Lurus', info: 'PDF • 1.2 MB' },
+        ],
+        class: 'VIII',
+        subject: 'Matematika',
+        teacher: 'Pak Budi',
+      },
+      'Bahasa Indonesia': {
+        title: 'Teks Narasi dan Deskripsi',
+        meta: 'Bahasa Indonesia • Kelas VIII',
+        breadcrumb: 'Materi > Bahasa Indonesia > Teks Narasi dan Deskripsi',
+        summary: 'Pelajari perbedaan teks narasi dan deskripsi serta cara menulis keduanya dengan bahasa yang baik dan jelas.',
+        objectives: [
+          'Siswa dapat membedakan karakteristik teks narasi dan deskripsi.',
+          'Siswa dapat mengidentifikasi struktur teks narasi dan deskripsi.',
+          'Siswa dapat membuat contoh paragraf narasi dan deskripsi.',
+        ],
+        materials: [
+          { title: '1. Pengenalan Teks Narasi', info: 'PDF • 1.5 MB' },
+          { title: '2. Latihan Teks Deskripsi', info: 'PDF • 1.4 MB' },
+        ],
+      },
+      IPA: {
+        title: 'Sistem Pernapasan Manusia',
+        meta: 'IPA • Kelas VIII',
+        breadcrumb: 'Materi > IPA > Sistem Pernapasan Manusia',
+        summary: 'Materi ini membahas organ pernapasan manusia, proses pernapasan, dan cara menjaga kesehatan sistem pernapasan.',
+        objectives: [
+          'Siswa dapat menyebutkan organ pernapasan manusia.',
+          'Siswa dapat menjelaskan proses pernapasan.',
+          'Siswa dapat menjaga kesehatan organ pernapasan.',
+        ],
+        materials: [
+          { title: '1. Organ Pernapasan Manusia', info: 'PDF • 2.3 MB' },
+          { title: '2. Proses Pernapasan', info: 'PDF • 1.9 MB' },
+        ],
+        class: 'VIII',
+        subject: 'IPA',
+        teacher: 'Bu Sari',
+      },
+      'Bahasa Inggris': {
+        title: 'Present Tense Dasar',
+        meta: 'Bahasa Inggris • Kelas VIII',
+        breadcrumb: 'Materi > Bahasa Inggris > Present Tense Dasar',
+        summary: 'Pelajari bentuk dasar present tense, penggunaan kata kerja, dan contoh kalimat positif, negatif, dan tanya.',
+        objectives: [
+          'Siswa dapat memahami struktur kalimat present tense.',
+          'Siswa dapat membuat kalimat present tense sederhana.',
+          'Siswa dapat menggunakan present tense dalam komunikasi sehari-hari.',
+        ],
+        materials: [
+          { title: '1. Present Tense Rules', info: 'PDF • 1.6 MB' },
+          { title: '2. Contoh Kalimat Present Tense', info: 'PDF • 1.2 MB' },
+        ],
+        class: 'VIII',
+        subject: 'Bahasa Inggris',
+        teacher: 'Mr. Andi',
+      },
+    };
+
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderSubjectCards() {
+      const subjectCards = document.getElementById('subjectCards');
+      subjectCards.innerHTML = Object.keys(subjectData).map((key) => {
+        const item = subjectData[key];
+        return `
+          <a href="materi.html?subject=${encodeURIComponent(key)}" class="bg-white p-4 rounded-2xl border border-slate-100 hover:shadow-lg transition">
+            <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center text-xs font-bold mb-3"><i class="fa-solid fa-book-open"></i></div>
+            <h4 class="text-xs font-bold">${escapeHtml(item.subject)}</h4>
+            <p class="text-[10px] text-slate-400 mt-1">${escapeHtml(item.teacher)}</p>
+            <p class="text-[10px] text-slate-400">Kelas ${escapeHtml(item.class)}</p>
+          </a>
+        `;
+      }).join('');
+    }
+
+    function renderPermateri(data) {
+      const materialList = document.getElementById('materialList');
+      materialList.innerHTML = data.materials.map((item) => `
+        <div class="bg-white p-4 rounded-2xl border border-slate-100">
+          <div class="flex items-start justify-between gap-3">
+            <div>
+              <h4 class="text-xs font-bold">${escapeHtml(item.title)}</h4>
+              <p class="text-[10px] text-slate-400 mt-1">${escapeHtml(item.info)}</p>
+            </div>
+            <button class="text-xs font-bold text-blue-600 border border-blue-200 px-3 py-1.5 rounded-xl hover:bg-blue-50">Lihat</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function showSubjectList() {
+      document.getElementById('subjectListSection').classList.remove('hidden');
+      document.getElementById('subjectDetailSection').classList.add('hidden');
+      document.getElementById('sidebarSection').classList.add('hidden');
+    }
+
+    function showSubjectDetail(data) {
+      document.getElementById('subjectListSection').classList.add('hidden');
+      document.getElementById('subjectDetailSection').classList.remove('hidden');
+      document.getElementById('sidebarSection').classList.remove('hidden');
+      updateSubjectContent(data);
+      renderPermateri(data);
+    }
+
+    function updateSubjectContent(data) {
+      document.getElementById('breadCrumb').textContent = data.breadcrumb;
+      document.getElementById('pageTitle').textContent = data.title;
+      document.getElementById('pageMeta').textContent = data.meta;
+      document.getElementById('summaryText').textContent = data.summary;
+      document.getElementById('objectiveList').innerHTML = data.objectives.map((item) => `<li>${escapeHtml(item)}</li>`).join('');
+      document.getElementById('detailClass').textContent = data.class;
+      document.getElementById('detailSubject').textContent = data.subject;
+      document.getElementById('detailTeacher').textContent = data.teacher;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSubjectCards();
+      const subjectKey = getQueryParam('subject');
+      if (subjectKey && subjectData[subjectKey]) {
+        showSubjectDetail(subjectData[subjectKey]);
+      } else {
+        showSubjectList();
+      }
+    });
+  </script>
+</body>
+</html>

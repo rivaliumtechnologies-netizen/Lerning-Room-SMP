@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kelola Tugas - Guru</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
+    <div>
+      <div class="p-3 mb-4 flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div><h2 class="font-extrabold text-xs text-slate-800 leading-none">Room Learning</h2><span class="text-[9px] font-bold text-blue-600">SMP</span></div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-house w-4"></i><span>Beranda</span></a>
+        <a href="kelola-materi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-book-open w-4"></i><span>Materi</span></a>
+        <a href="kelola-tugas.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs"><i class="fa-regular fa-clipboard w-4"></i><span>Tugas</span></a>
+        <a href="../pages/gemini-ai.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-robot w-4"></i><span>Gemini AI</span></a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Table Content -->
+  <main class="flex-1 overflow-y-auto p-8">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-6">
+      <h1 class="text-xl font-bold">Kelola Tugas</h1>
+      <div class="flex gap-2">
+        <button onclick="exportTasksReport()" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md shadow-emerald-200 hover:bg-emerald-700">Export Laporan</button>
+        <button onclick="openCreateTaskModal()" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md shadow-blue-200 hover:bg-blue-700">+ Buat Tugas</button>
+      </div>
+    </div>
+
+    <div id="taskModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-slate-900/50 px-4 py-6">
+      <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Buat Tugas Baru</h2>
+            <p class="text-xs text-slate-500">Isi detail tugas untuk siswa.</p>
+          </div>
+          <button onclick="closeCreateTaskModal()" class="text-slate-400 hover:text-slate-700 text-xl">&times;</button>
+        </div>
+
+        <form id="taskForm" class="space-y-4" onsubmit="submitTaskForm(event)">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Judul Tugas</label>
+            <input id="taskTitle" type="text" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Contoh: Tugas IPA tentang sistem pernapasan">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Mata Pelajaran</label>
+            <select id="taskSubject" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 bg-white">
+              <option value="">Pilih mata pelajaran</option>
+              <option value="Matematika">Matematika</option>
+              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+              <option value="IPA">IPA</option>
+              <option value="Bahasa Inggris">Bahasa Inggris</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Kelas</label>
+            <select id="taskClass" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 bg-white">
+              <option value="">Pilih kelas</option>
+              <option value="VII">VII</option>
+              <option value="VIII">VIII</option>
+              <option value="IX">IX</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Tenggat</label>
+            <input id="taskDeadline" type="date" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Jumlah Dikumpulkan</label>
+            <input id="taskSubmitted" type="number" min="0" value="0" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500">
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeCreateTaskModal()" class="rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Batal</button>
+            <button type="submit" class="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">Simpan Tugas</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
+          <tr><th class="p-4">Judul Tugas</th><th class="p-4">Mata Pelajaran</th><th class="p-4">Kelas</th><th class="p-4">Tenggat</th><th class="p-4">Dikumpulkan</th><th class="p-4">Aksi</th></tr>
+        </thead>
+        <tbody id="taskListBody" class="divide-y divide-slate-100"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'rl_smp_tasks';
+    const taskModal = document.getElementById('taskModal');
+    const taskForm = document.getElementById('taskForm');
+    const taskTableBody = document.getElementById('taskListBody');
+
+    document.addEventListener('DOMContentLoaded', loadTasks);
+
+    function openCreateTaskModal() {
+      taskModal.classList.remove('hidden');
+    }
+
+    function closeCreateTaskModal() {
+      taskModal.classList.add('hidden');
+      taskForm.reset();
+    }
+
+    function submitTaskForm(event) {
+      event.preventDefault();
+
+      const title = document.getElementById('taskTitle').value.trim();
+      const subject = document.getElementById('taskSubject').value.trim();
+      const deadline = document.getElementById('taskDeadline').value;
+      const submitted = parseInt(document.getElementById('taskSubmitted').value, 10) || 0;
+
+      const task = {
+        id: Date.now(),
+        title,
+        subject,
+        klas: document.getElementById('taskClass').value,
+        deadline,
+        submitted,
+      };
+
+      const tasks = getTasksFromStorage();
+      tasks.push(task);
+      saveTasksToStorage(tasks);
+      renderTaskRow(task);
+      closeCreateTaskModal();
+    }
+
+    function renderTaskRow(task) {
+      const row = document.createElement('tr');
+      row.dataset.taskId = task.id;
+      row.innerHTML = `
+        <td class="p-4 font-bold">${escapeHtml(task.title)}</td>
+        <td class="p-4">${escapeHtml(task.subject)}</td>
+        <td class="p-4">${escapeHtml(task.klas)}</td>
+        <td class="p-4">${escapeHtml(formatDate(task.deadline))}</td>
+        <td class="p-4 font-bold text-blue-600">${escapeHtml(task.submitted + '/-')}</td>
+        <td class="p-4 gap-2 flex text-slate-400">
+          <button type="button" onclick="deleteTask(${task.id})" class="text-red-500 hover:text-red-700 text-xs font-bold">Hapus</button>
+        </td>
+      `;
+      taskTableBody.appendChild(row);
+    }
+
+    function deleteTask(taskId) {
+      const tasks = getTasksFromStorage().filter((task) => task.id !== taskId);
+      saveTasksToStorage(tasks);
+      const row = taskTableBody.querySelector(`tr[data-task-id="${taskId}"]`);
+      if (row) row.remove();
+    }
+
+    function loadTasks() {
+      taskTableBody.innerHTML = '';
+      const tasks = getTasksFromStorage();
+      tasks.forEach(renderTaskRow);
+    }
+
+    function getTasksFromStorage() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveTasksToStorage(tasks) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+    }
+
+    function exportTasksReport() {
+      const tasks = getTasksFromStorage();
+      if (!tasks.length) {
+        alert('Tidak ada tugas untuk diekspor.');
+        return;
+      }
+
+      const headers = ['Judul Tugas', 'Mata Pelajaran', 'Kelas', 'Tenggat', 'Jumlah Dikumpulkan'];
+      const rows = tasks.map((task) => [
+        escapeCsv(task.title),
+        escapeCsv(task.subject),
+        escapeCsv(task.klas || '-'),
+        escapeCsv(formatDate(task.deadline)),
+        escapeCsv(`${task.submitted}/-`),
+      ]);
+
+      const csvContent = [headers, ...rows].map((row) => row.join(',')).join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `laporan_tugas_${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeCsv(value) {
+      const text = String(value || '');
+      if (/[",\r\n]/.test(text)) {
+        return '"' + text.replace(/"/g, '""') + '"';
+      }
+      return text;
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(value + 'T00:00:00');
+      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !taskModal.classList.contains('hidden')) {
+        closeCreateTaskModal();
+      }
+    });
+  </script>
+</body>
+</html>

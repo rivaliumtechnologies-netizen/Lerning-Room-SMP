@@ -1,0 +1,20 @@
+# CodeIgniter 4 Default Gitignore
+/aplikasi/writable/*
+!/aplikasi/writable/index.html
+!/aplikasi/writable/cache/
+!/aplikasi/writable/session/
+!/aplikasi/writable/logs/
+!/aplikasi/writable/uploads/
+
+# Uploads user / tugas siswa
+/aplikasi/public/uploads/*
+!/aplikasi/public/uploads/index.html
+
+# Composer vendor
+/aplikasi/vendor/
+
+# Temporary files & logs
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

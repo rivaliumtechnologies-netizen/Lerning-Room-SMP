@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Guru - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar Guru -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
+    <div>
+      <div class="p-3 mb-4 flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div><h2 class="font-extrabold text-xs text-slate-800 leading-none">Room Learning</h2><span class="text-[9px] font-bold text-blue-600">SMP</span></div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs"><i class="fa-solid fa-house w-4"></i><span>Beranda</span></a>
+        <a href="kelola-materi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-book-open w-4"></i><span>Kelola Materi</span></a>
+        <a href="kelola-tugas.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-clipboard w-4"></i><span>Kelola Tugas</span></a>
+        <a href="../pages/gemini-ai.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-robot w-4"></i><span>Gemini AI</span></a>
+      </nav>
+    </div>
+    <a href="../pages/index.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-red-500 hover:bg-red-50 font-bold text-xs"><i class="fa-solid fa-right-from-bracket w-4"></i><span>Keluar</span></a>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold">Selamat datang, Bu Sari! 👋</h1>
+      <span class="text-xs bg-slate-200 px-3 py-1 rounded-full font-semibold">Guru IPA</span>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-4 rounded-2xl border border-slate-100"><p class="text-[10px] text-slate-400 font-bold uppercase">Kelas Diampu</p><h3 class="text-xl font-extrabold text-slate-800 mt-1">3 Kelas</h3></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-100"><p class="text-[10px] text-slate-400 font-bold uppercase">Jumlah Siswa</p><h3 class="text-xl font-extrabold text-slate-800 mt-1">72 Siswa</h3></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-100"><p class="text-[10px] text-slate-400 font-bold uppercase">Tugas Aktif</p><h3 class="text-xl font-extrabold text-slate-800 mt-1">8 Tugas</h3></div>
+      <div class="bg-white p-4 rounded-2xl border border-slate-100"><p class="text-[10px] text-slate-400 font-bold uppercase">Tugas Dikumpulkan</p><h3 class="text-xl font-extrabold text-slate-800 mt-1">36 Tugas</h3></div>
+    </div>
+
+    <div class="bg-gradient-to-r from-indigo-600 to-sky-500 rounded-3xl p-6 mb-8 text-white shadow-lg shadow-sky-200">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 class="text-lg font-bold">AI Gemini untuk Guru</h2>
+          <p class="text-xs text-sky-100 mt-2">Gunakan Gemini sebagai referensi pembuatan tugas dan materi pembelajaran yang lebih kaya.</p>
+        </div>
+        <a href="../pages/gemini-ai.html" class="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-xs font-bold text-slate-900 hover:bg-slate-100">Buka Gemini AI</a>
+      </div>
+    </div>
+
+    <!-- Daftar Kelas -->
+    <h3 class="font-bold text-sm mb-3">Kelas Saya</h3>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-2xl border border-slate-100">
+        <h4 class="font-bold text-sm text-blue-600 mb-1">Kelas VII A</h4>
+        <p class="text-xs text-slate-400">IPA • 24 Siswa</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-100">
+        <h4 class="font-bold text-sm text-blue-600 mb-1">Kelas VII B</h4>
+        <p class="text-xs text-slate-400">IPA • 24 Siswa</p>
+      </div>
+      <div class="bg-white p-5 rounded-2xl border border-slate-100">
+        <h4 class="font-bold text-sm text-blue-600 mb-1">Kelas VIII</h4>
+        <p class="text-xs text-slate-400">IPA • 24 Siswa</p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

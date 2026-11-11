@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-white border-b border-slate-200 px-6 py-5 shadow-sm sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold">Admin Panel</h1>
+        <p class="text-sm text-slate-500">Cek user siswa dan guru serta ekspor seluruh laporan ke Excel.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button id="refreshButton" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700">Muat Ulang</button>
+        <button id="exportUsersButton" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700">Export User</button>
+        <button id="exportTasksButton" class="bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-amber-700">Export Tugas</button>
+        <button id="printButton" class="bg-slate-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-700">Cetak Laporan</button>
+        <button id="logoutButton" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+    <section class="grid gap-6 md:grid-cols-2">
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Daftar Guru</h2>
+            <p class="text-sm text-slate-500">Lihat semua akun guru terdaftar.</p>
+          </div>
+          <div class="text-right text-xs text-slate-500" id="guruCount">0 akun</div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="p-3 border border-slate-200">NIP</th>
+                <th class="p-3 border border-slate-200">Username</th>
+                <th class="p-3 border border-slate-200">Password</th>
+                <th class="p-3 border border-slate-200">Nama</th>
+                <th class="p-3 border border-slate-200">Mata Pelajaran</th>
+              </tr>
+            </thead>
+            <tbody id="guruTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Daftar Siswa</h2>
+            <p class="text-sm text-slate-500">Lihat semua akun siswa terdaftar.</p>
+          </div>
+          <div class="text-right text-xs text-slate-500" id="siswaCount">0 akun</div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="p-3 border border-slate-200">NIS</th>
+                <th class="p-3 border border-slate-200">Username</th>
+                <th class="p-3 border border-slate-200">Password</th>
+                <th class="p-3 border border-slate-200">Nama</th>
+                <th class="p-3 border border-slate-200">Kelas</th>
+              </tr>
+            </thead>
+            <tbody id="siswaTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Tambah Akun Baru</h2>
+            <p class="text-sm text-slate-500">Buat akun guru atau siswa langsung dari panel admin.</p>
+          </div>
+        </div>
+        <form id="addUserForm" class="space-y-4">
+          <div class="flex gap-2">
+            <button type="button" id="addRoleSiswa" class="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-xs font-bold bg-blue-600 text-white">Siswa</button>
+            <button type="button" id="addRoleGuru" class="flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50">Guru</button>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Nama Lengkap</label>
+            <input id="addUserName" type="text" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Masukkan nama lengkap">
+          </div>
+          <div>
+            <label id="addUserIdentifierLabel" class="block text-[11px] font-bold uppercase text-slate-500 mb-2">NIS Siswa</label>
+            <input id="addUserIdentifier" type="text" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Contoh: 2024001">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Kata Sandi</label>
+            <input id="addUserPassword" type="password" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Buat kata sandi">
+          </div>
+          <div>
+            <label id="addUserExtraLabel" class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Kelas (opsional)</label>
+            <input id="addUserExtra" type="text" class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Opsional">
+          </div>
+          <button type="submit" class="w-full rounded-2xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">Simpan Akun</button>
+        </form>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Ubah Kata Sandi</h2>
+            <p class="text-sm text-slate-500">Perbarui password akun guru atau siswa yang sudah ada.</p>
+          </div>
+        </div>
+        <form id="changePasswordForm" class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Pilih Akun</label>
+            <select id="passwordUserSelect" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 bg-white"></select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Kata Sandi Baru</label>
+            <input id="newPasswordInput" type="password" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Masukkan kata sandi baru">
+          </div>
+          <button type="submit" class="w-full rounded-2xl bg-amber-600 px-4 py-2 text-sm font-bold text-white hover:bg-amber-700">Ubah Password</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <h2 class="text-lg font-bold">Laporan Tugas</h2>
+          <p class="text-sm text-slate-500">Semua tugas yang sudah dibuat oleh guru.</p>
+        </div>
+        <div class="text-xs text-slate-500" id="taskCount">0 tugas</div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="p-3 border border-slate-200">Judul</th>
+              <th class="p-3 border border-slate-200">Mata Pelajaran</th>
+              <th class="p-3 border border-slate-200">Tenggat</th>
+              <th class="p-3 border border-slate-200">Dikumpulkan</th>
+            </tr>
+          </thead>
+          <tbody id="taskTableBody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const USERS_KEY = 'rl_smp_users';
+    const TASKS_KEY = 'rl_smp_tasks';
+    let addUserRole = 'siswa';
+
+    const guruTableBody = document.getElementById('guruTableBody');
+    const siswaTableBody = document.getElementById('siswaTableBody');
+    const taskTableBody = document.getElementById('taskTableBody');
+    const guruCount = document.getElementById('guruCount');
+    const siswaCount = document.getElementById('siswaCount');
+    const taskCount = document.getElementById('taskCount');
+    const refreshButton = document.getElementById('refreshButton');
+    const exportUsersButton = document.getElementById('exportUsersButton');
+    const exportTasksButton = document.getElementById('exportTasksButton');
+    const printButton = document.getElementById('printButton');
+    const addUserForm = document.getElementById('addUserForm');
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const addRoleSiswa = document.getElementById('addRoleSiswa');
+    const addRoleGuru = document.getElementById('addRoleGuru');
+    const addUserIdentifierLabel = document.getElementById('addUserIdentifierLabel');
+    const addUserExtraLabel = document.getElementById('addUserExtraLabel');
+    const addUserExtra = document.getElementById('addUserExtra');
+    const addUserIdentifier = document.getElementById('addUserIdentifier');
+    const passwordUserSelect = document.getElementById('passwordUserSelect');
+
+    const logoutButton = document.getElementById('logoutButton');
+
+    refreshButton.addEventListener('click', loadAdminData);
+    exportUsersButton.addEventListener('click', exportUsersReport);
+    exportTasksButton.addEventListener('click', exportTasksReport);
+    printButton.addEventListener('click', () => window.print());
+    logoutButton.addEventListener('click', () => window.location.href = '../pages/index.html');
+    addUserForm.addEventListener('submit', submitAddUserForm);
+    changePasswordForm.addEventListener('submit', submitPasswordChangeForm);
+    addRoleSiswa.addEventListener('click', () => setAddUserRole('siswa'));
+    addRoleGuru.addEventListener('click', () => setAddUserRole('guru'));
+
+    document.addEventListener('DOMContentLoaded', loadAdminData);
+
+    function loadAdminData() {
+      const users = getUsersFromStorage();
+      const tasks = getTasksFromStorage();
+
+      const guruUsers = users.filter((user) => user.role === 'guru');
+      const siswaUsers = users.filter((user) => user.role === 'siswa');
+
+      guruTableBody.innerHTML = guruUsers.length ? guruUsers.map(renderGuruRow).join('') : '<tr><td colspan="6" class="p-4 text-slate-500">Belum ada guru terdaftar.</td></tr>';
+      siswaTableBody.innerHTML = siswaUsers.length ? siswaUsers.map(renderSiswaRow).join('') : '<tr><td colspan="6" class="p-4 text-slate-500">Belum ada siswa terdaftar.</td></tr>';
+      taskTableBody.innerHTML = tasks.length ? tasks.map(renderTaskRow).join('') : '<tr><td colspan="4" class="p-4 text-slate-500">Belum ada tugas.</td></tr>';
+
+      guruCount.textContent = `${guruUsers.length} akun`;
+      siswaCount.textContent = `${siswaUsers.length} akun`;
+      taskCount.textContent = `${tasks.length} tugas`;
+      populatePasswordUserSelect(users);
+    }
+
+    function renderGuruRow(user) {
+      return `
+        <tr>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.identifier)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.username || user.identifier)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.password || '-')}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.name)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.extra || '-')}</td>
+          <td class="p-3 border border-slate-200"><button type="button" onclick="openPasswordModal('${user.id}')" class="rounded-lg bg-amber-600 px-2.5 py-1.5 text-[10px] font-bold text-white hover:bg-amber-700">Ubah</button></td>
+        </tr>
+      `;
+    }
+
+    function renderSiswaRow(user) {
+      return `
+        <tr>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.identifier)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.username || user.identifier)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.password || '-')}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.name)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(user.extra || '-')}</td>
+          <td class="p-3 border border-slate-200"><button type="button" onclick="openPasswordModal('${user.id}')" class="rounded-lg bg-amber-600 px-2.5 py-1.5 text-[10px] font-bold text-white hover:bg-amber-700">Ubah</button></td>
+        </tr>
+      `;
+    }
+
+    function renderTaskRow(task) {
+      return `
+        <tr>
+          <td class="p-3 border border-slate-200">${escapeHtml(task.title)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(task.subject)}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(formatDate(task.deadline))}</td>
+          <td class="p-3 border border-slate-200">${escapeHtml(task.submitted + '/-')}</td>
+        </tr>
+      `;
+    }
+
+    function setAddUserRole(role) {
+      addUserRole = role;
+      addRoleSiswa.className = role === 'siswa'
+        ? 'flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-xs font-bold bg-blue-600 text-white'
+        : 'flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50';
+      addRoleGuru.className = role === 'guru'
+        ? 'flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-xs font-bold bg-blue-600 text-white'
+        : 'flex-1 rounded-2xl border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50';
+
+      addUserIdentifierLabel.textContent = role === 'siswa' ? 'NIS Siswa' : 'NIP Guru';
+      addUserExtraLabel.textContent = role === 'siswa' ? 'Kelas (opsional)' : 'Mata Pelajaran (opsional)';
+      addUserExtra.placeholder = role === 'siswa' ? 'Contoh: 8A' : 'Contoh: Matematika';
+      addUserIdentifier.placeholder = role === 'siswa' ? 'Contoh: 2024001' : 'Contoh: 1987001';
+    }
+
+    function submitAddUserForm(e) {
+      e.preventDefault();
+      const name = document.getElementById('addUserName').value.trim();
+      const identifier = addUserIdentifier.value.trim();
+      const password = document.getElementById('addUserPassword').value;
+      const extra = addUserExtra.value.trim();
+
+      if (!name || !identifier || !password) {
+        alert('Lengkapi semua data wajib.');
+        return;
+      }
+
+      const users = getUsersFromStorage();
+      if (users.some((user) => user.identifier === identifier && user.role === addUserRole)) {
+        alert(`Akun ${addUserRole} dengan identifier ini sudah terdaftar.`);
+        return;
+      }
+
+      users.push({
+        id: Date.now().toString(),
+        role: addUserRole,
+        name,
+        identifier,
+        password,
+        extra,
+      });
+      saveUsersToStorage(users);
+      addUserForm.reset();
+      setAddUserRole('siswa');
+      loadAdminData();
+      alert(`Akun ${addUserRole} berhasil dibuat.`);
+    }
+
+    function openPasswordModal(userId) {
+      const users = getUsersFromStorage();
+      const selected = users.find((user) => user.id === userId);
+      if (!selected) return;
+
+      passwordUserSelect.value = userId;
+      document.getElementById('newPasswordInput').value = '';
+      document.getElementById('changePasswordForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      document.getElementById('newPasswordInput').focus();
+    }
+
+    function submitPasswordChangeForm(e) {
+      e.preventDefault();
+      const userId = passwordUserSelect.value;
+      const newPassword = document.getElementById('newPasswordInput').value;
+
+      if (!userId || !newPassword) {
+        alert('Pilih akun dan masukkan password baru.');
+        return;
+      }
+
+      const users = getUsersFromStorage();
+      const selectedUser = users.find((user) => user.id === userId);
+      if (!selectedUser) {
+        alert('Akun tidak ditemukan.');
+        return;
+      }
+
+      selectedUser.password = newPassword;
+      saveUsersToStorage(users);
+      loadAdminData();
+      alert(`Password akun ${selectedUser.name} berhasil diubah.`);
+    }
+
+    function populatePasswordUserSelect(users) {
+      passwordUserSelect.innerHTML = '';
+      const placeholder = document.createElement('option');
+      placeholder.value = '';
+      placeholder.textContent = 'Pilih akun';
+      passwordUserSelect.appendChild(placeholder);
+
+      users.forEach((user) => {
+        const option = document.createElement('option');
+        option.value = user.id;
+        option.textContent = `${user.role === 'guru' ? 'Guru' : 'Siswa'} - ${user.name} (${user.identifier})`;
+        passwordUserSelect.appendChild(option);
+      });
+    }
+
+    function getUsersFromStorage() {
+      try {
+        const raw = localStorage.getItem(USERS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveUsersToStorage(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function getTasksFromStorage() {
+      try {
+        const raw = localStorage.getItem(TASKS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function exportUsersReport() {
+      const users = getUsersFromStorage();
+      if (!users.length) {
+        alert('Tidak ada user untuk diekspor.');
+        return;
+      }
+
+      const headers = ['Role', 'Identifier', 'Username', 'Password', 'Nama', 'Kelas / Mata Pelajaran'];
+      const rows = users.map((user) => [
+        escapeCsv(user.role),
+        escapeCsv(user.identifier),
+        escapeCsv(user.username || user.identifier),
+        escapeCsv(user.password || ''),
+        escapeCsv(user.name),
+        escapeCsv(user.extra || ''),
+      ]);
+
+      downloadCsv([headers, ...rows], 'laporan_users.csv');
+    }
+
+    function exportTasksReport() {
+      const tasks = getTasksFromStorage();
+      if (!tasks.length) {
+        alert('Tidak ada tugas untuk diekspor.');
+        return;
+      }
+
+      const headers = ['Judul Tugas', 'Mata Pelajaran', 'Tenggat', 'Dikumpulkan'];
+      const rows = tasks.map((task) => [
+        escapeCsv(task.title),
+        escapeCsv(task.subject),
+        escapeCsv(formatDate(task.deadline)),
+        escapeCsv(task.submitted + '/-'),
+      ]);
+
+      downloadCsv([headers, ...rows], 'laporan_tugas.csv');
+    }
+
+    function downloadCsv(rows, filename) {
+      const csvContent = rows.map((row) => row.join(',')).join('\r\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+
+    function escapeCsv(value) {
+      const text = String(value || '');
+      if (/[",\r\n]/.test(text)) {
+        return '"' + text.replace(/"/g, '""') + '"';
+      }
+      return text;
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(value + 'T00:00:00');
+      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

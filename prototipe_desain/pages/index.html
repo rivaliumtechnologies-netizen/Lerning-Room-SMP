@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-gradient-to-br from-blue-500 via-indigo-500 to-blue-600 min-h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center border border-white/20">
+    <!-- Logo -->
+    <div class="flex justify-center items-center gap-2 mb-2">
+      <div class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center font-bold text-lg shadow-md">
+        <i class="fa-solid fa-graduation-cap"></i>
+      </div>
+      <div class="text-left">
+        <h1 class="text-base font-extrabold text-slate-800 leading-none">Room Learning</h1>
+        <span class="text-[10px] font-bold text-blue-600 tracking-wider">SMP</span>
+      </div>
+    </div>
+    <p class="text-slate-400 text-xs mb-6 font-medium">Belajar mudah, pintar bersama</p>
+    
+  <!-- Role Switcher -->
+    <div class="bg-slate-100 p-1 rounded-2xl flex mb-6 border border-slate-200">
+      <button id="btn-siswa" onclick="switchRole('siswa')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-sm transition-all">Siswa</button>
+      <button id="btn-guru" onclick="switchRole('guru')" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition-all">Guru</button>
+      <button id="btn-admin" onclick="switchRole('admin')" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition-all">Admin</button>
+    </div>
+    
+  <!-- Form -->
+    <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+      <div>
+        <label class="text-xs font-bold text-slate-700">Username</label>
+        <input id="loginIdentifier" type="text" required placeholder="Masukkan username" class="w-full mt-1.5 p-3 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-700">Password</label>
+        <input id="loginPassword" type="password" required placeholder="Masukkan password" class="w-full mt-1.5 p-3 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+      </div>
+      <div class="flex justify-between items-center text-[11px]">
+        <label class="flex items-center gap-1.5 text-slate-500 cursor-pointer">
+          <input type="checkbox" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500"> Ingat saya
+        </label>
+        <a href="#" class="text-blue-600 font-bold hover:underline">Lupa kata sandi?</a>
+      </div>
+      <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs shadow-md shadow-blue-200 transition mt-2">Masuk</button>
+    </form>
+  </div>
+  <script>
+    const USERS_KEY = 'rl_smp_users';
+    let activeRole = 'siswa';
+
+    function switchRole(role) {
+      activeRole = role;
+      const siswaButton = document.getElementById('btn-siswa');
+      const guruButton = document.getElementById('btn-guru');
+      const adminButton = document.getElementById('btn-admin');
+
+      siswaButton.className = 'flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition-all';
+      guruButton.className = 'flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition-all';
+      adminButton.className = 'flex-1 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-slate-800 transition-all';
+
+      if (role === 'siswa') {
+        siswaButton.className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-sm transition-all';
+      } else if (role === 'guru') {
+        guruButton.className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-sm transition-all';
+      } else {
+        adminButton.className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white shadow-sm transition-all';
+      }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('loginIdentifier').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (activeRole === 'admin') {
+        if (identifier === 'adminsistem' && password === 'admin26') {
+          window.location.href = '../admin/admin.html';
+          return;
+        }
+        alert('Login admin gagal. Pastikan username dan password benar.');
+        return;
+      }
+
+      const users = getUsersFromStorage();
+      const matched = users.find((user) => user.identifier === identifier && user.password === password && user.role === activeRole);
+      if (matched) {
+        window.location.href = activeRole === 'siswa' ? '../siswa/dashboard.html' : '../guru/dashboard.html';
+      } else {
+        alert('Login gagal. Pastikan role, identifier, dan kata sandi benar. Jika belum punya akun, tambahkan dahulu.');
+      }
+    }
+
+    function getUsersFromStorage() {
+      try {
+        const raw = localStorage.getItem(USERS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveUsersToStorage(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Kelola Materi - Guru</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
+    <div>
+      <div class="p-3 mb-4 flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div><h2 class="font-extrabold text-xs text-slate-800 leading-none">Room Learning</h2><span class="text-[9px] font-bold text-blue-600">SMP</span></div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-house w-4"></i><span>Beranda</span></a>
+        <a href="kelola-materi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs"><i class="fa-regular fa-book-open w-4"></i><span>Materi</span></a>
+        <a href="kelola-tugas.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-clipboard w-4"></i><span>Tugas</span></a>
+        <a href="../pages/gemini-ai.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-robot w-4"></i><span>Gemini AI</span></a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Table Content -->
+  <main class="flex-1 overflow-y-auto p-8">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-xl font-bold">Kelola Materi</h1>
+      <button onclick="openUploadModal()" class="bg-blue-600 text-white font-bold px-4 py-2 rounded-xl text-xs shadow-md shadow-blue-200">+ Upload Materi</button>
+    </div>
+
+    <div id="uploadModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-slate-900/50 px-4 py-6">
+      <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Upload Materi Baru</h2>
+            <p class="text-xs text-slate-500">Tambahkan materi untuk siswa.</p>
+          </div>
+          <button onclick="closeUploadModal()" class="text-slate-400 hover:text-slate-700 text-xl">&times;</button>
+        </div>
+
+        <form id="uploadForm" class="space-y-4" onsubmit="submitUploadForm(event)">
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Judul Materi</label>
+            <input id="materiTitle" type="text" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500" placeholder="Masukkan judul materi">
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Mata Pelajaran</label>
+            <select id="materiSubject" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 bg-white">
+              <option value="">Pilih mata pelajaran</option>
+              <option value="Matematika">Matematika</option>
+              <option value="Bahasa Indonesia">Bahasa Indonesia</option>
+              <option value="IPA">IPA</option>
+              <option value="Bahasa Inggris">Bahasa Inggris</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">Kelas</label>
+            <select id="materiClass" required class="w-full rounded-2xl border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 bg-white">
+              <option value="">Pilih kelas</option>
+              <option value="VII">VII</option>
+              <option value="VIII">VIII</option>
+              <option value="IX">IX</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[11px] font-bold uppercase text-slate-500 mb-2">File Materi</label>
+            <input id="materiFile" type="file" required class="w-full text-sm text-slate-700">
+          </div>
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" onclick="closeUploadModal()" class="rounded-2xl border border-slate-200 px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">Batal</button>
+            <button type="submit" class="rounded-2xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">Simpan Materi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-slate-50 text-slate-400 font-bold border-b border-slate-100">
+          <tr><th class="p-4">Judul Materi</th><th class="p-4">Mata Pelajaran</th><th class="p-4">Kelas</th><th class="p-4">Tanggal</th><th class="p-4">Aksi</th></tr>
+        </thead>
+        <tbody id="materiTableBody" class="divide-y divide-slate-100"></tbody>
+      </table>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'rl_smp_materials';
+    const uploadModal = document.getElementById('uploadModal');
+    const uploadForm = document.getElementById('uploadForm');
+    const materiTableBody = document.getElementById('materiTableBody');
+
+    function loadMaterials() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    }
+
+    function saveMaterials(materials) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(materials));
+    }
+
+    function renderMaterials() {
+      const materials = loadMaterials();
+      materiTableBody.innerHTML = '';
+
+      if (materials.length === 0) {
+        materiTableBody.innerHTML = `
+          <tr class="text-center text-slate-500">
+            <td class="p-6" colspan="5">Belum ada materi yang diunggah.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      materials.forEach((item) => {
+        const row = document.createElement('tr');
+        row.dataset.id = item.id;
+        row.innerHTML = `
+          <td class="p-4 font-bold">${escapeHtml(item.title)}<div class="text-[11px] text-slate-500 mt-1">${escapeHtml(item.fileName)}</div></td>
+          <td class="p-4">${escapeHtml(item.subject)}</td>
+          <td class="p-4">${escapeHtml(item.klas)}</td>
+          <td class="p-4">${escapeHtml(item.date)}</td>
+          <td class="p-4 gap-2 flex text-slate-400"><i class="fa-regular fa-pen-to-square cursor-pointer hover:text-blue-600"></i><i class="fa-regular fa-trash-can cursor-pointer hover:text-red-500" onclick="deleteMateriRow(this)"></i></td>
+        `;
+        materiTableBody.appendChild(row);
+      });
+    }
+
+    function openUploadModal() {
+      uploadModal.classList.remove('hidden');
+    }
+
+    function closeUploadModal() {
+      uploadModal.classList.add('hidden');
+      uploadForm.reset();
+    }
+
+    function submitUploadForm(event) {
+      event.preventDefault();
+      const title = document.getElementById('materiTitle').value.trim();
+      const subject = document.getElementById('materiSubject').value;
+      const klas = document.getElementById('materiClass').value;
+      const fileInput = document.getElementById('materiFile');
+      const fileName = fileInput.files.length ? fileInput.files[0].name : 'Tidak ada file';
+      const date = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      const materials = loadMaterials();
+      materials.push({
+        id: Date.now().toString(),
+        title,
+        subject,
+        klas,
+        fileName,
+        date,
+      });
+      saveMaterials(materials);
+      renderMaterials();
+      closeUploadModal();
+    }
+
+    function deleteMateriRow(button) {
+      const row = button.closest('tr');
+      if (!row) return;
+      const id = row.dataset.id;
+      const materials = loadMaterials().filter((item) => item.id !== id);
+      saveMaterials(materials);
+      renderMaterials();
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    window.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !uploadModal.classList.contains('hidden')) {
+        closeUploadModal();
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', renderMaterials);
+  </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <header class="bg-white border-b border-slate-200 px-6 py-5 shadow-sm sticky top-0 z-20">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-xl font-bold">Admin Panel</h1>
+        <p class="text-sm text-slate-500">Cek user siswa dan guru serta ekspor seluruh laporan ke Excel.</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button id="refreshButton" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-700">Muat Ulang</button>
+        <button id="exportUsersButton" class="bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-emerald-700">Export User</button>
+        <button id="exportTasksButton" class="bg-amber-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-amber-700">Export Tugas</button>
+        <button id="printButton" class="bg-slate-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-slate-700">Cetak Laporan</button>
+        <button id="logoutButton" class="bg-red-600 text-white px-4 py-2 rounded-xl text-xs font-bold hover:bg-red-700">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-6 py-8 space-y-8">
+    <section class="grid gap-6 md:grid-cols-2">
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Daftar Guru</h2>
+            <p class="text-sm text-slate-500">Lihat semua akun guru terdaftar.</p>
+          </div>
+          <div class="text-right text-xs text-slate-500" id="guruCount">0 akun</div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="p-3 border border-slate-200">NIP</th>
+                <th class="p-3 border border-slate-200">Username</th>
+                <th class="p-3 border border-slate-200">Password</th>
+                <th class="p-3 border border-slate-200">Nama</th>
+                <th class="p-3 border border-slate-200">Mata Pelajaran</th>
+              </tr>
+            </thead>
+            <tbody id="guruTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <h2 class="text-lg font-bold">Daftar Siswa</h2>
+            <p class="text-sm text-slate-500">Lihat semua akun siswa terdaftar.</p>
+          </div>
+          <div class="text-right text-xs text-slate-500" id="siswaCount">0 akun</div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs border-collapse">
+            <thead class="bg-slate-50 text-slate-500 uppercase text-[10px] tracking-wider">
+              <tr>
+                <th class="p-3 border border-slate-200">NIS</th>
+                <th class="p-3 border border-slate-200">Username</th>
+                <th class="p-3 border border-slate-200">Password</th>
+                <th class="p-3 border border-slate-200">Nama</th>
+                <th class="p-3 border border-slate-200">Kelas</th>
+              </tr>
+            </thead>
+            <tbody id="siswaTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+...

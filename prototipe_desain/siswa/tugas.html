@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tugas Siswa - Room Learning SMP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 p-4">
+    <div>
+      <div class="p-3 mb-4 flex items-center gap-2">
+        <div class="w-8 h-8 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold text-sm"><i class="fa-solid fa-graduation-cap"></i></div>
+        <div><h2 class="font-extrabold text-xs text-slate-800 leading-none">Room Learning</h2><span class="text-[9px] font-bold text-blue-600">SMP</span></div>
+      </div>
+      <nav class="space-y-1">
+        <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-house w-4"></i><span>Beranda</span></a>
+        <a href="materi.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-regular fa-book-open w-4"></i><span>Materi</span></a>
+        <a href="tugas.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-blue-50 text-blue-600 font-bold text-xs"><i class="fa-regular fa-clipboard w-4"></i><span>Tugas</span></a>
+        <a href="../pages/gemini-ai.html" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-slate-50 font-semibold text-xs"><i class="fa-solid fa-sparkles text-blue-600 w-4"></i><span>AI Gemini</span></a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Content Grid -->
+  <main class="flex-1 overflow-y-auto p-8 grid grid-cols-3 gap-8">
+    <!-- List Tugas -->
+    <div class="col-span-2">
+      <h1 class="text-xl font-bold mb-4">Tugas</h1>
+      <div class="flex gap-4 border-b border-slate-200 mb-4 text-xs font-bold">
+        <button class="pb-2 border-b-2 border-blue-600 text-blue-600">Tugas Aktif</button>
+        <button class="pb-2 text-slate-400">Tugas Selesai</button>
+      </div>
+      <div id="studentTaskList" class="space-y-3"></div>
+    </div>
+
+    <!-- Dropzone Upload Panel Kanan -->
+    <div class="bg-white p-6 rounded-3xl border border-slate-100 flex flex-col justify-between">
+      <div>
+        <h3 class="font-bold text-sm text-slate-800 mb-1">Upload Tugas</h3>
+        <p id="uploadTaskSubtitle" class="text-[10px] text-slate-400 mb-4">Pilih tugas dari daftar tugas aktif.</p>
+        <div id="dropzone" class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center bg-slate-50/50 mb-4">
+          <i class="fa-solid fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
+          <p class="text-xs font-medium text-slate-600 mb-2">Tarik & lepas file di sini<br><span class="text-[10px] text-slate-400">atau</span></p>
+          <button type="button" id="selectFileButton" class="bg-white border border-slate-200 text-slate-700 text-[11px] font-bold px-3 py-1.5 rounded-xl">Pilih File</button>
+          <input id="tugasFileInput" type="file" class="hidden" />
+          <p id="selectedFileName" class="text-[11px] text-slate-500 mt-3">Belum ada file dipilih.</p>
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">Catatan untuk guru (opsional)</label>
+          <textarea id="tugasNote" rows="3" placeholder="Tulis catatan jika ada..." class="w-full p-2.5 border border-slate-200 rounded-xl text-xs bg-slate-50 focus:outline-none"></textarea>
+        </div>
+      </div>
+      <button id="sendTaskButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-xs shadow-md shadow-blue-200 transition">Kirim Tugas</button>
+    </div>
+  </main>
+
+  <script>
+    const TASKS_KEY = 'rl_smp_tasks';
+    const SUBMISSIONS_KEY = 'rl_smp_submissions';
+
+    const studentTaskList = document.getElementById('studentTaskList');
+    const uploadTaskSubtitle = document.getElementById('uploadTaskSubtitle');
+    const selectFileButton = document.getElementById('selectFileButton');
+    const tugasFileInput = document.getElementById('tugasFileInput');
+    const selectedFileName = document.getElementById('selectedFileName');
+    const tugasNote = document.getElementById('tugasNote');
+    const sendTaskButton = document.getElementById('sendTaskButton');
+    const dropzone = document.getElementById('dropzone');
+
+    let selectedTaskId = null;
+    let selectedFile = null;
+    let selectedCard = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderStudentTasks();
+      selectFileButton.addEventListener('click', () => tugasFileInput.click());
+      tugasFileInput.addEventListener('change', handleFileChange);
+      dropzone.addEventListener('dragover', (event) => {
+        event.preventDefault();
+        dropzone.classList.add('border-blue-500', 'bg-blue-50');
+      });
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+      });
+      dropzone.addEventListener('drop', handleDrop);
+      sendTaskButton.addEventListener('click', handleSendTask);
+    });
+
+    function getTasksFromStorage() {
+      try {
+        const raw = localStorage.getItem(TASKS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function getSubmissions() {
+      try {
+        const raw = localStorage.getItem(SUBMISSIONS_KEY);
+        return raw ? JSON.parse(raw) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveSubmissions(submissions) {
+      localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify(submissions));
+    }
+
+    function renderStudentTasks() {
+      const tasks = getTasksFromStorage();
+      studentTaskList.innerHTML = '';
+
+      if (!tasks.length) {
+        studentTaskList.innerHTML = '<div class="bg-white p-4 rounded-2xl border border-slate-200 text-slate-500 text-sm">Belum ada tugas aktif saat ini.</div>';
+        return;
+      }
+
+      tasks.forEach((task) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'w-full text-left bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center cursor-pointer hover:border-blue-300';
+        card.dataset.taskId = task.id;
+        card.innerHTML = `
+          <div>
+            <h4 class="text-xs font-bold text-slate-800">${escapeHtml(task.title)}</h4>
+            <p class="text-[10px] text-slate-400">${escapeHtml(task.subject)} • Tenggat: ${escapeHtml(formatDate(task.deadline))}</p>
+          </div>
+          <span class="text-[10px] font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-full border border-amber-200">Pilih</span>
+        `;
+        card.addEventListener('click', () => selectTask(card, task.id));
+        studentTaskList.appendChild(card);
+      });
+    }
+
+    function selectTask(card, taskId) {
+      if (selectedCard) {
+        selectedCard.classList.remove('border-blue-300', 'bg-blue-50');
+      }
+      selectedCard = card;
+      selectedTaskId = taskId;
+      card.classList.add('border-blue-300', 'bg-blue-50');
+      const task = getTasksFromStorage().find((item) => item.id === taskId);
+      uploadTaskSubtitle.textContent = task ? `Siap mengunggah tugas: ${task.title}` : 'Pilih tugas dari daftar tugas aktif.';
+    }
+
+    function handleFileChange() {
+      if (tugasFileInput.files.length) {
+        selectedFile = tugasFileInput.files[0];
+        selectedFileName.textContent = `File dipilih: ${selectedFile.name}`;
+      } else {
+        selectedFile = null;
+        selectedFileName.textContent = 'Belum ada file dipilih.';
+      }
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      dropzone.classList.remove('border-blue-500', 'bg-blue-50');
+      const files = event.dataTransfer.files;
+      if (!files.length) {
+        return;
+      }
+      tugasFileInput.files = files;
+      handleFileChange();
+    }
+
+    function handleSendTask() {
+      if (!selectedTaskId) {
+        alert('Pilih tugas yang ingin dikirim terlebih dahulu.');
+        return;
+      }
+
+      if (!selectedFile) {
+        alert('Pilih file tugas terlebih dahulu.');
+        return;
+      }
+
+      const submissions = getSubmissions();
+      const submission = {
+        id: `sub-${Date.now()}`,
+        taskId: selectedTaskId,
+        studentName: 'Siswa',
+        fileName: selectedFile.name,
+        note: tugasNote.value.trim(),
+        submittedAt: new Date().toISOString(),
+      };
+      submissions.push(submission);
+      saveSubmissions(submissions);
+
+      alert(`Tugas berhasil dikirim: ${selectedFile.name}`);
+      resetUploadForm();
+    }
+
+    function resetUploadForm() {
+      selectedTaskId = null;
+      selectedFile = null;
+      selectedFileName.textContent = 'Belum ada file dipilih.';
+      tugasNote.value = '';
+      uploadTaskSubtitle.textContent = 'Pilih tugas dari daftar tugas aktif.';
+      if (selectedCard) {
+        selectedCard.classList.remove('border-blue-300', 'bg-blue-50');
+        selectedCard = null;
+      }
+      tugasFileInput.value = '';
+    }
+
+    function formatDate(value) {
+      if (!value) return '-';
+      const date = new Date(`${value}T00:00:00`);
+      return new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }).format(date);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>
